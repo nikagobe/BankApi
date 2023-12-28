@@ -9,27 +9,27 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace BankApi.Application.BankAccounts.Queries;
-public class CurrentUserTransactionsQuery : IRequest<List<Transaction>>
+public class GetCurrentUserTransactionsQuery : IRequest<List<Transaction>>
 {
     public Guid UserId { get; set; }
 }
 
-public class CurrentUserTransactionsQueryHandler : IRequestHandler<CurrentUserTransactionsQuery, List<Transaction>>
+public class GetCurrentUserTransactionsQueryHandler : IRequestHandler<GetCurrentUserTransactionsQuery, List<Transaction>>
 {
     private readonly IApplicationDbContext _context;
 
-    public CurrentUserTransactionsQueryHandler(IApplicationDbContext context)
+    public GetCurrentUserTransactionsQueryHandler(IApplicationDbContext context)
     {
         _context = context;
     }
 
-    public async Task<List<Transaction>> Handle(CurrentUserTransactionsQuery request, CancellationToken cancellationToken)
+    public async Task<List<Transaction>> Handle(GetCurrentUserTransactionsQuery request, CancellationToken cancellationToken)
     {
-        var bankAccount = await _context.BankAccounts.FirstOrDefaultAsync(x => x.UserId == request.UserId);
+        var bankAccount = await _context.BankAccounts.AsNoTracking().FirstOrDefaultAsync(x => x.UserId == request.UserId);
 
         var bankAccountId = bankAccount.BankAccountId;
 
-        var transactions = await _context.Transactions.Where(x => x.FromId == bankAccountId 
+        var transactions = await _context.Transactions.AsNoTracking().Where(x => x.FromId == bankAccountId 
                                                               || x.ToId == bankAccountId).ToListAsync(cancellationToken);
         return transactions;
     }

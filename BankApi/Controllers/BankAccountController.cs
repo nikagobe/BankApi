@@ -13,33 +13,26 @@ namespace BankApi.Api.Controllers;
 [Route("[controller]")]
 public class BankAccountController : BaseController
 {
-    private readonly IIdentityService _identityService;
     public BankAccountController(IMediator mediator, 
-                                 IIdentityService identityService) : base(mediator)
-    {
-        _identityService = identityService;
+                                 IIdentityService identityService) : base(mediator, identityService)
+    { 
     }
 
     [HttpPost]
     [Route("Transfer")]
     public async Task<IActionResult> Transfer(TransferMoneyDto request)
     {
-        var authorizationHeader = HttpContext.Request.Headers["Authorization"].FirstOrDefault();
-        var jwtToken = authorizationHeader.Substring("Bearer ".Length).Trim();
-
-
-        var currentUserId = await _identityService.GetUserIdFromToken(jwtToken);
 
         var command = new TransferMoneyCommand()
         {
             Amount = request.Amount,
             FromAccountId = request.FromAccountId,
             ToAccountId = request.ToAccountId,
-            UserId = currentUserId
+            UserId = await GetCurrentUserId()
         };
 
 
-        await _mediator.Send(request);
+        await _mediator.Send(command);
 
         return Ok();
     }
@@ -60,13 +53,7 @@ public class BankAccountController : BaseController
     public async Task<IActionResult> Withdraw(WithdrawMoneyCommand request)
     {
 
-        var authorizationHeader = HttpContext.Request.Headers["Authorization"].FirstOrDefault();
-        var jwtToken = authorizationHeader.Substring("Bearer ".Length).Trim();
-
-
-        var currentUserId = await _identityService.GetUserIdFromToken(jwtToken);
-
-        request.UserId = currentUserId;
+        request.UserId = await GetCurrentUserId();
 
         await _mediator.Send(request);
 
@@ -78,15 +65,9 @@ public class BankAccountController : BaseController
     public async Task<IActionResult> CurrentUserBankAccount()
     {
 
-        var authorizationHeader = HttpContext.Request.Headers["Authorization"].FirstOrDefault();
-        var jwtToken = authorizationHeader.Substring("Bearer ".Length).Trim();
-
-
-        var currentUserId = await _identityService.GetUserIdFromToken(jwtToken);
-
-        var request = new CurrentUserBankAccountQuery()
+        var request = new GetCurrentUserBankAccountQuery()
         {
-            UserId = currentUserId
+            UserId = await GetCurrentUserId()
         };
 
         return Ok(await _mediator.Send(request));
@@ -97,15 +78,9 @@ public class BankAccountController : BaseController
     public async Task<IActionResult> CurrentUserTransactions()
     {
 
-        var authorizationHeader = HttpContext.Request.Headers["Authorization"].FirstOrDefault();
-        var jwtToken = authorizationHeader.Substring("Bearer ".Length).Trim();
-
-
-        var currentUserId = await _identityService.GetUserIdFromToken(jwtToken);
-
-        var request = new CurrentUserTransactionsQuery()
+        var request = new GetCurrentUserTransactionsQuery()
         {
-            UserId = currentUserId
+            UserId = await GetCurrentUserId()
         };
 
         return Ok(await _mediator.Send(request));

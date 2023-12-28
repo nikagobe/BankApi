@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 namespace BankApi.Application.Identity.Service;
 public interface IIdentityService
 {
-    public Task CreateCredentials(CreateCredentialsRequest request, CancellationToken cancellationToken);
+    Task CreateCredentials(CreateCredentialsRequest request, CancellationToken cancellationToken);
     Task<string> GenerateToken(LoginRequest request);
     Task<Guid> GetUserIdFromToken(string token);
-    public Task<bool> IsValidCredentials(LoginRequest request);
+    Task<bool> IsValidCredentials(LoginRequest request);
 }

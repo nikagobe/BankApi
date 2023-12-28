@@ -45,15 +45,12 @@ public class TransferMoneyValidator : AbstractValidator<TransferMoneyCommand>
 
     public async Task<bool> ExistAccount(Guid AccountId, CancellationToken cancellationToken)
     {
-        var bankAccount = await _unitOfWork.DbContext.BankAccounts.Where(x => x.BankAccountId == AccountId).FirstOrDefaultAsync(cancellationToken);
-
-        return bankAccount is not null;
-
+        return await _unitOfWork.DbContext.BankAccounts.AnyAsync(x => x.BankAccountId == AccountId, cancellationToken);
     }
 
     public async Task<bool> OwnAccount(Guid UserId, Guid AccountId, CancellationToken cancellationToken)
     {
-        var bankAccount = await _unitOfWork.DbContext.BankAccounts.Where(x => x.BankAccountId == AccountId).FirstOrDefaultAsync(cancellationToken);
+        var bankAccount = await _unitOfWork.DbContext.BankAccounts.FirstOrDefaultAsync(x => x.BankAccountId == AccountId, cancellationToken);
 
         return bankAccount.UserId == UserId;
 
@@ -61,7 +58,7 @@ public class TransferMoneyValidator : AbstractValidator<TransferMoneyCommand>
 
     public async Task<bool> HaveEnoughMoney(Guid AccountId, decimal Amount, CancellationToken cancellationToken)
     {
-        var bankAccount = await _unitOfWork.DbContext.BankAccounts.Where(x => x.BankAccountId == AccountId).FirstOrDefaultAsync(cancellationToken);
+        var bankAccount = await _unitOfWork.DbContext.BankAccounts.FirstOrDefaultAsync(x => x.BankAccountId == AccountId, cancellationToken);
 
         return bankAccount.MoneyAmount >= Amount;
 

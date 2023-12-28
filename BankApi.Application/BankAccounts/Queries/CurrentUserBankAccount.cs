@@ -9,23 +9,23 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace BankApi.Application.BankAccounts.Queries;
-public class CurrentUserBankAccountQuery : IRequest<BankAccount>
+public class GetCurrentUserBankAccountQuery : IRequest<BankAccount>
 {
     public Guid UserId { get; set; }
 }
 
-public class CurrentUserBankAccountQueryHandler : IRequestHandler<CurrentUserBankAccountQuery, BankAccount>
+public class GetCurrentUserBankAccountQueryHandler : IRequestHandler<GetCurrentUserBankAccountQuery, BankAccount>
 {
     private readonly IApplicationDbContext _context;
 
-    public CurrentUserBankAccountQueryHandler(IApplicationDbContext context)
+    public GetCurrentUserBankAccountQueryHandler(IApplicationDbContext context)
     {
         _context = context;
     }
 
-    public async Task<BankAccount> Handle(CurrentUserBankAccountQuery request, CancellationToken cancellationToken)
+    public async Task<BankAccount> Handle(GetCurrentUserBankAccountQuery request, CancellationToken cancellationToken)
     {
-        var bankAccount = await _context.BankAccounts.FirstOrDefaultAsync(x => x.UserId == request.UserId);
+        var bankAccount = await _context.BankAccounts.AsNoTracking().FirstOrDefaultAsync(x => x.UserId == request.UserId);
         return bankAccount;
     }
 }

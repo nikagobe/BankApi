@@ -8,11 +8,13 @@ using BankApi.Infrastructure.Configuration;
 using BankApi.Infrastructure.Data;
 using BankApi.Infrastructure.Services;
 using FluentValidation;
+using Microsoft.Extensions.Logging;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -35,6 +37,13 @@ builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBeh
 builder.Services.AddTransient<IValidator<TransferMoneyCommand>, TransferMoneyValidator>();
 builder.Services.AddTransient<IValidator<DepositMoneyCommand>, DepositMoneyValidator>();
 builder.Services.AddTransient<IValidator<WithdrawMoneyCommand>, WithdrawMoneyValidator>();
+
+
+builder.Services.AddLogging(loggingBuilder =>
+{
+    loggingBuilder.AddConsole();
+});
+
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
  .AddJwtBearer(options =>

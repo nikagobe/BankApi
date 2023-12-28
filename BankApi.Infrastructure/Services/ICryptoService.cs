@@ -7,6 +7,6 @@ using System.Threading.Tasks;
 namespace BankApi.Infrastructure.Services;
 public interface ICryptoService
 {
-    public string GenerateSalt();
-    public string GenerateHash(string password, string salt);
+    string GenerateSalt();
+    string GenerateHash(string password, string salt);
 }

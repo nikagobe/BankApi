@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace BankApi.Application.Users.Commands;
 
 
-public class CreateUserCommand : IRequest<string>
+public class CreateUserCommand : IRequest
 {
     public string UserName { get; set; }
     public string Password { get; set; }
@@ -24,7 +24,7 @@ public class CreateUserCommand : IRequest<string>
     public DateTime BirthDate { get; set; }
 }
 
-public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, string>
+public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand>
 {
     private readonly UnitOfWork _unitOfWork;
     private readonly IIdentityService _identityService;
@@ -36,7 +36,7 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, strin
         _identityService = identityService;
     }
 
-    public async Task<string> Handle(CreateUserCommand request, CancellationToken cancellationToken)
+    public async Task Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
         var user = await AddUser(request, cancellationToken);
 
@@ -45,8 +45,6 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, strin
         await AddBankAccount(user, cancellationToken);
 
         await _unitOfWork.CommitAsync(cancellationToken);
-
-        return "Success";
     }
 
     private async Task AddBankAccount(User user, CancellationToken cancellationToken)

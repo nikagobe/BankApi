@@ -30,9 +30,8 @@ public class DepositMoneyValidator : AbstractValidator<DepositMoneyCommand>
 
     public async Task<bool> ExistAccount(Guid AccountId, CancellationToken cancellationToken)
     {
-        var bankAccount = await _unitOfWork.DbContext.BankAccounts.Where(x => x.BankAccountId == AccountId).FirstOrDefaultAsync(cancellationToken);
+        return await _unitOfWork.DbContext.BankAccounts.AnyAsync(x => x.BankAccountId == AccountId, cancellationToken);
 
-        return bankAccount is not null;
 
     }
 }
